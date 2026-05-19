@@ -1416,7 +1416,7 @@
           body: JSON.stringify({ orderData: { reference, amount, phone: "254" + phone.replace(/^0/, ""), email, firstName: fullName, lastName: "", ticketName, quantity: qty, mpesaCode, status: "pending_verification" } })
         });
       } catch(e) {}
-      window.location.href = "/success.html?ref=" + reference + "&code=" + mpesaCode;
+      window.location.href = "/success.html?ref=" + reference + "&code=" + mpesaCode + "&email=" + encodeURIComponent(email) + "&name=" + encodeURIComponent(fullName) + "&ticket=" + encodeURIComponent(ticketName) + "&qty=" + qty + "&amount=" + amount + "&phone=" + encodeURIComponent("254" + phone.replace(/^0/, ""));
     }
 
     function showError(msg) {
@@ -1439,4 +1439,3 @@
   </script>
 </body>
 </html>
-
