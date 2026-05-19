@@ -2,10 +2,13 @@
   "version": 2,
   "builds": [
     { "src": "api/pesapal.js", "use": "@vercel/node" },
-    { "src": "public/**", "use": "@vercel/static" }
+    { "src": "*.html", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/pesapal", "dest": "/api/pesapal.js" },
-    { "src": "/(.*)", "dest": "/public/$1" }
+    { "src": "/", "dest": "/summertides-store.html" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/success", "dest": "/success.html" },
+    { "src": "/(.*)", "dest": "/$1" }
   ]
 }
