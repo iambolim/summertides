@@ -1,39 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Payment Successful – Summer Tides 2026</title>
+  <title>Order Received – Summer Tides 2026</title>
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Nunito',sans-serif; background:#fdf6f0; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; }
-    .card { background:white; border-radius:16px; padding:2.5rem 2rem; max-width:420px; width:100%; text-align:center; box-shadow:0 8px 40px rgba(0,0,0,0.08); }
-    .icon { font-size:3.5rem; margin-bottom:1rem; }
-    .title { font-family:'Bangers',cursive; font-size:2rem; letter-spacing:2px; color:#1a1a1a; margin-bottom:0.5rem; }
-    .subtitle { color:#1a9e8a; font-weight:700; font-size:1.1rem; margin-bottom:1rem; }
-    .msg { font-size:0.9rem; color:#666; line-height:1.6; margin-bottom:1.5rem; }
-    .ref { background:#f0f9f7; border:1px solid #c0e8e0; border-radius:8px; padding:0.75rem 1rem; font-size:0.85rem; color:#1a9e8a; font-weight:700; margin-bottom:1.5rem; }
-    .back-btn { background:#1a9e8a; color:white; border:none; border-radius:10px; padding:0.8rem 2rem; font-family:'Nunito',sans-serif; font-weight:700; font-size:0.95rem; cursor:pointer; text-decoration:none; display:inline-block; }
-    .back-btn:hover { background:#147a6b; }
-    .footer-note { font-size:0.75rem; color:#aaa; margin-top:1.5rem; }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Nunito',sans-serif;background:#fdf6f0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
+    .card{background:white;border-radius:16px;padding:2.5rem 2rem;max-width:420px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.08);}
+    .icon{font-size:3.5rem;margin-bottom:1rem;}
+    .title{font-family:'Bangers',cursive;font-size:2rem;letter-spacing:2px;color:#1a1a1a;margin-bottom:0.5rem;}
+    .subtitle{color:#1a9e8a;font-weight:700;font-size:1.1rem;margin-bottom:1rem;}
+    .msg{font-size:0.9rem;color:#666;line-height:1.6;margin-bottom:1.5rem;}
+    .info-box{background:#e8f5f2;border:1px solid #b2dfdb;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;text-align:left;}
+    .info-row{display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:0.4rem;}
+    .info-label{color:#666;}
+    .info-value{font-weight:700;color:#1a1a1a;}
+    .warning-box{background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:0.9rem 1.1rem;font-size:0.8rem;color:#666;line-height:1.6;margin-bottom:1.5rem;text-align:left;}
+    .back-btn{background:#1a9e8a;color:white;border:none;border-radius:10px;padding:0.8rem 2rem;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.95rem;cursor:pointer;text-decoration:none;display:inline-block;}
+    .back-btn:hover{background:#147a6b;}
+    .footer-note{font-size:0.72rem;color:#aaa;margin-top:1.2rem;}
   </style>
 </head>
 <body>
   <div class="card">
     <div class="icon">🎟️</div>
     <div class="title">SUMMER TIDES 2026</div>
-    <div class="subtitle">Payment Successful! 🎉</div>
-    <p class="msg">Your ticket has been confirmed. Check your email and SMS for your ticket details. See you at the beach!</p>
-    <div class="ref" id="refBox">Loading your reference...</div>
-    <a href="/summertides-store.html" class="back-btn">← Back to Store</a>
-    <div class="footer-note">Questions? Contact us on our socials.</div>
+    <div class="subtitle">Order Received! 🎉</div>
+    <p class="msg">Thank you for your payment! Your order is being verified. You will receive confirmation shortly.</p>
+    <div class="info-box">
+      <div class="info-row"><span class="info-label">Order Ref:</span><span class="info-value" id="refVal">—</span></div>
+      <div class="info-row"><span class="info-label">M-Pesa Code:</span><span class="info-value" id="codeVal">—</span></div>
+      <div class="info-row"><span class="info-label">Status:</span><span class="info-value" style="color:#f5a623;">Pending Verification</span></div>
+    </div>
+    <div class="warning-box">
+      📱 <strong>Keep your M-Pesa transaction code safe.</strong> Our team will verify your payment and confirm your ticket via SMS/email within <strong>30 minutes</strong>. If you have any issues contact us on our socials.
+    </div>
+    <a href="/" class="back-btn">← Back to Store</a>
+    <div class="footer-note">Summer Tides Festival · Malindi, Kenya · July 2026</div>
   </div>
   <script>
     const params = new URLSearchParams(window.location.search);
-    const ref = params.get('OrderMerchantReference') || params.get('reference') || 'N/A';
-    const tracking = params.get('OrderTrackingId') || '';
-    document.getElementById('refBox').innerHTML = `Ref: <strong>${ref}</strong>${tracking ? `<br>Tracking: ${tracking}` : ''}`;
+    const ref = params.get('ref') || params.get('OrderMerchantReference') || 'N/A';
+    const code = params.get('code') || params.get('OrderTrackingId') || 'N/A';
+    document.getElementById('refVal').textContent = ref.substring(0, 20);
+    document.getElementById('codeVal').textContent = code;
   </script>
 </body>
 </html>

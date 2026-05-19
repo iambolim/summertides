@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard – Summer Tides 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #fdf6f0;
+      --white: #ffffff;
+      --teal: #1a9e8a;
+      --teal-dark: #147a6b;
+      --teal-light: #e1f5f2;
+      --text: #1a1a1a;
+      --muted: #666;
+      --border: #e8e0d8;
+      --card-bg: #fdf0e8;
+      --red: #e8614a;
+      --amber: #f5a623;
+      --green: #27ae60;
+    }
+    body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* NAV */
+    .topnav {
+      background: var(--white); border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem; display: flex; align-items: center;
+      justify-content: space-between; position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand { font-family: 'Bangers', cursive; font-size: 1.2rem; letter-spacing: 2px; color: var(--text); }
+    .nav-badge {
+      background: var(--teal-light); color: var(--teal); font-size: 0.72rem;
+      font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 20px; margin-left: 0.5rem;
+    }
+    .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-store-link {
+      font-size: 0.82rem; color: var(--teal); text-decoration: none;
+      border: 1px solid var(--teal); border-radius: 8px; padding: 0.35rem 0.8rem;
+      font-weight: 700; transition: background 0.15s;
+    }
+    .nav-store-link:hover { background: var(--teal-light); }
+    .refresh-btn {
+      background: var(--teal); color: white; border: none; border-radius: 8px;
+      padding: 0.4rem 0.9rem; font-family: 'Nunito', sans-serif; font-size: 0.82rem;
+      font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;
+    }
+    .refresh-btn:hover { background: var(--teal-dark); }
+    .refresh-btn svg { transition: transform 0.4s; }
+    .refresh-btn.spinning svg { transform: rotate(360deg); }
+
+    /* LOGIN */
+    .login-wrap {
+      min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 2rem;
+    }
+    .login-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2.5rem 2rem; max-width: 380px;
+      width: 100%; text-align: center;
+    }
+    .login-logo { font-family: 'Bangers', cursive; font-size: 1.6rem; letter-spacing: 3px; margin-bottom: 0.3rem; }
+    .login-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .login-label { font-size: 0.8rem; font-weight: 700; color: #555; text-align: left; margin-bottom: 0.4rem; display: block; }
+    .login-input {
+      width: 100%; border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.65rem 0.9rem; font-family: 'Nunito', sans-serif;
+      font-size: 0.88rem; outline: none; background: white; color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .login-input:focus { border-color: var(--teal); }
+    .login-btn {
+      width: 100%; background: var(--teal); color: white; border: none;
+      border-radius: 10px; padding: 0.8rem; font-family: 'Nunito', sans-serif;
+      font-weight: 700; font-size: 0.95rem; cursor: pointer;
+    }
+    .login-btn:hover { background: var(--teal-dark); }
+    .login-error {
+      background: #fff0f0; border: 1px solid #f5c0c0; border-radius: 8px;
+      padding: 0.6rem 0.9rem; font-size: 0.82rem; color: #c0392b;
+      margin-bottom: 1rem; display: none;
+    }
+
+    /* DASHBOARD */
+    .dashboard { display: none; }
+    .dash-body { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* STATS GRID */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.2rem 1.4rem;
+    }
+    .stat-label { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+    .stat-value { font-size: 1.7rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+    .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+    .stat-card.teal { border-left: 3px solid var(--teal); }
+    .stat-card.green { border-left: 3px solid var(--green); }
+    .stat-card.amber { border-left: 3px solid var(--amber); }
+    .stat-card.red { border-left: 3px solid var(--red); }
+
+    /* CHARTS ROW */
+    .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+    .chart-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.2rem 1.4rem;
+    }
+    .chart-title { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 1rem; }
+    .chart-wrap { position: relative; width: 100%; height: 200px; }
+
+    /* ORDERS TABLE */
+    .table-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .table-header {
+      padding: 1rem 1.4rem; display: flex; align-items: center;
+      justify-content: space-between; border-bottom: 1px solid var(--border);
+    }
+    .table-title { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+    .table-filters { display: flex; gap: 0.5rem; }
+    .filter-btn {
+      font-size: 0.75rem; font-weight: 700; padding: 0.3rem 0.7rem;
+      border-radius: 20px; border: 1px solid var(--border); background: var(--bg);
+      cursor: pointer; color: var(--muted); transition: all 0.15s;
+    }
+    .filter-btn.active { background: var(--teal); color: white; border-color: var(--teal); }
+    .search-box {
+      border: 1px solid var(--border); border-radius: 8px; padding: 0.4rem 0.8rem;
+      font-family: 'Nunito', sans-serif; font-size: 0.82rem; outline: none;
+      background: var(--bg); color: var(--text); width: 200px;
+    }
+    .search-box:focus { border-color: var(--teal); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    thead { background: var(--bg); }
+    th { padding: 0.7rem 1rem; text-align: left; font-weight: 700; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    td { padding: 0.85rem 1rem; border-top: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+    tr:hover td { background: #faf7f4; }
+    .badge {
+      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px;
+      font-size: 0.72rem; font-weight: 700;
+    }
+    .badge-completed { background: #e8f5e9; color: #27ae60; }
+    .badge-pending { background: #fff8e1; color: #f5a623; }
+    .badge-failed { background: #fdecea; color: #e8614a; }
+    .badge-unknown { background: #f5f5f5; color: #888; }
+    .empty-state { text-align: center; padding: 3rem; color: var(--muted); font-size: 0.88rem; }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .table-footer { padding: 0.75rem 1.4rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+
+    /* LOADING */
+    .loading-overlay {
+      position: fixed; inset: 0; background: rgba(253,246,240,0.85);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 999; font-size: 0.9rem; color: var(--muted); gap: 1rem;
+    }
+    .spinner {
+      width: 36px; height: 36px; border: 3px solid var(--border);
+      border-top-color: var(--teal); border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      .charts-row { grid-template-columns: 1fr; }
+      .table-filters { display: none; }
+      .dash-body { padding: 1rem; }
+      .topnav { padding: 0.75rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div>Loading dashboard...</div>
+</div>
+
+<!-- TOP NAV -->
+<nav class="topnav" id="topnav" style="display:none;">
+  <div style="display:flex;align-items:center;gap:0.5rem;">
+    <div class="nav-brand">SUMMER TIDES</div>
+    <span class="nav-badge">ADMIN</span>
+  </div>
+  <div class="nav-right">
+    <a href="/summertides-store.html" class="nav-store-link">← View Store</a>
+    <button class="refresh-btn" onclick="loadDashboard(true)" id="refreshBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Refresh
+    </button>
+    <button class="refresh-btn" style="background:#e8614a;" onclick="logout()">Sign out</button>
+  </div>
+</nav>
+
+<!-- LOGIN PAGE -->
+<div class="login-wrap" id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">SUMMER TIDES</div>
+    <div class="login-sub">Admin Dashboard · Ticket Sales</div>
+    <div class="login-error" id="loginError"></div>
+    <label class="login-label">Supabase URL</label>
+    <input class="login-input" type="text" id="sbUrl" placeholder="https://xxx.supabase.co" value="https://ocynwynflqzdzyzzykzo.supabase.co"/>
+    <label class="login-label">Supabase Publishable Key</label>
+    <input class="login-input" type="password" id="sbKey" placeholder="sb_publishable_..."/>
+    <label class="login-label">Admin Password</label>
+    <input class="login-input" type="password" id="adminPass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')login()"/>
+    <button class="login-btn" onclick="login()">Sign In →</button>
+    <div style="font-size:0.72rem;color:var(--muted);margin-top:1rem;">Secured · Only you can access this page</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboardPage">
+  <div class="dash-body">
+
+    <!-- STATS -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card teal">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value" id="statRevenue">—</div>
+        <div class="stat-sub">All completed orders</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Tickets Sold</div>
+        <div class="stat-value" id="statTickets">—</div>
+        <div class="stat-sub">Completed payments</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value" id="statPending">—</div>
+        <div class="stat-sub">Awaiting payment</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value" id="statTotal">—</div>
+        <div class="stat-sub">All time</div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Revenue by Ticket Type</div>
+        <div class="chart-wrap">
+          <canvas id="ticketChart" role="img" aria-label="Revenue by ticket type bar chart">Ticket revenue breakdown.</canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Orders by Status</div>
+        <div class="chart-wrap">
+          <canvas id="statusChart" role="img" aria-label="Orders by payment status doughnut chart">Orders status breakdown.</canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">All Orders</div>
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <input class="search-box" type="text" placeholder="Search name, email, ref..." id="searchBox" oninput="filterTable()"/>
+          <div class="table-filters">
+            <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+            <button class="filter-btn" onclick="setFilter('completed',this)">Completed</button>
+            <button class="filter-btn" onclick="setFilter('pending',this)">Pending</button>
+            <button class="filter-btn" onclick="setFilter('failed',this)">Failed</button>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Customer</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Ticket</th>
+              <th>Qty</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody">
+            <tr><td colspan="9"><div class="empty-state"><div class="empty-icon">🎟️</div>Loading orders...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <span id="tableCount">0 orders</span>
+        <span id="tableRevenue">KES 0</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const ADMIN_PASSWORD = 'summertides2026admin';
+  let allOrders = [];
+  let currentFilter = 'all';
+  let ticketChartInst = null;
+  let statusChartInst = null;
+  let supabaseUrl = '';
+  let supabaseKey = '';
+
+  function login() {
+    const url = document.getElementById('sbUrl').value.trim();
+    const key = document.getElementById('sbKey').value.trim();
+    const pass = document.getElementById('adminPass').value.trim();
+    const errEl = document.getElementById('loginError');
+
+    if (!url || !key) { showLoginError('Please enter your Supabase URL and publishable key.'); return; }
+    if (pass !== ADMIN_PASSWORD) { showLoginError('Incorrect admin password.'); return; }
+
+    supabaseUrl = url;
+    supabaseKey = key;
+    sessionStorage.setItem('st_url', url);
+    sessionStorage.setItem('st_key', key);
+    showDashboard();
+  }
+
+  function showLoginError(msg) {
+    const el = document.getElementById('loginError');
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  function logout() {
+    sessionStorage.clear();
+    document.getElementById('dashboardPage').style.display = 'none';
+    document.getElementById('topnav').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('adminPass').value = '';
+  }
+
+  function showDashboard() {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboardPage').style.display = 'block';
+    document.getElementById('topnav').style.display = 'flex';
+    loadDashboard(false);
+  }
+
+  async function loadDashboard(showSpinner) {
+    if (showSpinner) {
+      const btn = document.getElementById('refreshBtn');
+      btn.classList.add('spinning');
+      setTimeout(() => btn.classList.remove('spinning'), 700);
+    }
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    try {
+      const res = await fetch(`${supabaseUrl}/rest/v1/orders?select=*&order=created_at.desc`, {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+        }
+      });
+      if (!res.ok) throw new Error('Failed to fetch orders: ' + res.status);
+      allOrders = await res.json();
+      renderStats();
+      renderCharts();
+      filterTable();
+    } catch (err) {
+      document.getElementById('ordersBody').innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">⚠️</div>${err.message}</div></td></tr>`;
+    } finally {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+  }
+
+  function renderStats() {
+    const completed = allOrders.filter(o => o.status === 'completed');
+    const pending = allOrders.filter(o => o.status === 'pending');
+    const revenue = completed.reduce((s, o) => s + parseFloat(o.amount || 0), 0);
+    const tickets = completed.reduce((s, o) => s + parseInt(o.quantity || 1), 0);
+    document.getElementById('statRevenue').textContent = 'KES ' + revenue.toLocaleString('en-KE', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+    document.getElementById('statTickets').textContent = tickets;
+    document.getElementById('statPending').textContent = pending.length;
+    document.getElementById('statTotal').textContent = allOrders.length;
+  }
+
+  function renderCharts() {
+    // Revenue by ticket type
+    const ticketMap = {};
+    allOrders.filter(o => o.status === 'completed').forEach(o => {
+      const name = o.ticket_name || 'Unknown';
+      ticketMap[name] = (ticketMap[name] || 0) + parseFloat(o.amount || 0);
+    });
+    const tLabels = Object.keys(ticketMap);
+    const tData = Object.values(ticketMap);
+
+    if (ticketChartInst) ticketChartInst.destroy();
+    ticketChartInst = new Chart(document.getElementById('ticketChart'), {
+      type: 'bar',
+      data: {
+        labels: tLabels.length ? tLabels : ['No data'],
+        datasets: [{
+          label: 'Revenue (KES)',
+          data: tData.length ? tData : [0],
+          backgroundColor: '#1a9e8a',
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { callback: v => 'KES ' + v.toLocaleString() }, grid: { color: '#f0e8e0' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+
+    // Status doughnut
+    const statusCounts = { completed: 0, pending: 0, failed: 0 };
+    allOrders.forEach(o => { if (statusCounts[o.status] !== undefined) statusCounts[o.status]++; });
+
+    if (statusChartInst) statusChartInst.destroy();
+    statusChartInst = new Chart(document.getElementById('statusChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Completed', 'Pending', 'Failed'],
+        datasets: [{
+          data: [statusCounts.completed, statusCounts.pending, statusCounts.failed],
+          backgroundColor: ['#27ae60', '#f5a623', '#e8614a'],
+          borderWidth: 0,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 10, padding: 14, font: { size: 11 } }
+          }
+        }
+      }
+    });
+  }
+
+  function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterTable();
+  }
+
+  function filterTable() {
+    const search = document.getElementById('searchBox').value.toLowerCase();
+    let filtered = allOrders;
+    if (currentFilter !== 'all') filtered = filtered.filter(o => o.status === currentFilter);
+    if (search) filtered = filtered.filter(o =>
+      (o.customer_first_name || '').toLowerCase().includes(search) ||
+      (o.customer_last_name || '').toLowerCase().includes(search) ||
+      (o.customer_email || '').toLowerCase().includes(search) ||
+      (o.reference || '').toLowerCase().includes(search) ||
+      (o.customer_phone || '').toLowerCase().includes(search)
+    );
+    renderTable(filtered);
+  }
+
+  function renderTable(orders) {
+    const tbody = document.getElementById('ordersBody');
+    if (!orders.length) {
+      tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">🎟️</div>No orders found.</div></td></tr>`;
+      document.getElementById('tableCount').textContent = '0 orders';
+      document.getElementById('tableRevenue').textContent = 'KES 0';
+      return;
+    }
+    const totalRev = orders.filter(o => o.status === 'completed').reduce((s, o) => s + parseFloat(o.amount || 0), 0);
+    document.getElementById('tableCount').textContent = orders.length + ' order' + (orders.length !== 1 ? 's' : '');
+    document.getElementById('tableRevenue').textContent = 'KES ' + totalRev.toLocaleString('en-KE', {minimumFractionDigits: 0});
+
+    tbody.innerHTML = orders.map(o => {
+      const date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-KE', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+      const status = o.status || 'unknown';
+      const badgeClass = status === 'completed' ? 'badge-completed' : status === 'pending' ? 'badge-pending' : status === 'failed' ? 'badge-failed' : 'badge-unknown';
+      const amount = parseFloat(o.amount || 0).toLocaleString('en-KE', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      return `
+        <tr>
+          <td style="font-family:monospace;font-size:0.78rem;color:#888;">${(o.reference || '—').substring(0,14)}...</td>
+          <td style="font-weight:700;">${o.customer_first_name || ''} ${o.customer_last_name || ''}</td>
+          <td style="color:var(--muted);">${o.customer_email || '—'}</td>
+          <td style="color:var(--muted);">${o.customer_phone || '—'}</td>
+          <td>${o.ticket_name || '—'}</td>
+          <td style="text-align:center;">${o.quantity || 1}</td>
+          <td style="font-weight:700;">KES ${amount}</td>
+          <td><span class="badge ${badgeClass}">${status}</span></td>
+          <td style="color:var(--muted);white-space:nowrap;">${date}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  // Auto-login if session exists
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('loadingOverlay').style.display = 'none';
+    const savedUrl = sessionStorage.getItem('st_url');
+    const savedKey = sessionStorage.getItem('st_key');
+    if (savedUrl && savedKey) {
+      supabaseUrl = savedUrl;
+      supabaseKey = savedKey;
+      document.getElementById('sbUrl').value = savedUrl;
+      document.getElementById('sbKey').value = savedKey;
+      showDashboard();
+    }
+  });
+
+  // Auto-refresh every 60 seconds
+  setInterval(() => {
+    if (document.getElementById('dashboardPage').style.display !== 'none') loadDashboard(false);
+  }, 60000);
+</script>
+</body>
+</html>
